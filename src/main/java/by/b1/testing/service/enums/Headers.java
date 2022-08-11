@@ -1,5 +1,8 @@
-package by.b1.testing;
+package by.b1.testing.service.enums;
 
+/**
+ * Contains excel table headers
+ */
 public enum Headers {
   BILL("Б/сч", null, -1),
   OPENING_BALANCE_ASSETS("Актив", "ВХОДЯЩЕЕ САЛЬДО", -1),
