@@ -1,23 +1,22 @@
-package by.b1.testing.service.services;
+package by.b1.testing.service.utils;
 
 import by.b1.testing.service.enums.Headers;
-import by.b1.testing.service.utils.Converter;
 import java.time.LocalDate;
 import java.util.Objects;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
- * Contains methods to work with excel file
+ * Contains methods to work with excel sheets
  *
  * @author Lizaveta Yakauleva
  * @version 1.0
  */
-@Service
-public class ExcelFileService {
+@Component
+public class ExcelUtils {
 
   /**
    * initializes {@code Headers} enum with data

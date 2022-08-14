@@ -2,17 +2,26 @@ package by.b1.testing.service.services;
 
 import by.b1.testing.repository.entity.Balance;
 import by.b1.testing.repository.entity.Class;
+import by.b1.testing.repository.entity.File;
 import by.b1.testing.repository.entity.Turnover;
+import by.b1.testing.repository.enums.BalanceType;
 import by.b1.testing.repository.repos.BalanceRepository;
 import by.b1.testing.repository.repos.ClassRepository;
+import by.b1.testing.repository.repos.FileRepository;
 import by.b1.testing.repository.repos.TurnoverRepository;
+import by.b1.testing.service.dto.BalanceDto;
+import by.b1.testing.service.dto.TurnoverDto;
 import by.b1.testing.service.enums.Headers;
+import by.b1.testing.service.mappers.BalanceMapper;
+import by.b1.testing.service.mappers.TurnoverMapper;
 import by.b1.testing.service.utils.Converter;
+import by.b1.testing.service.utils.ExcelUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -31,29 +40,60 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ComponentScan("by.b1.testing")
-public class MainService {
+public class DataService {
   private final ClassRepository classRepository;
   private final BalanceRepository balanceRepository;
   private final TurnoverRepository turnoverRepository;
-  private final ExcelFileService excelFileService;
+  private final FileRepository fileRepository;
+  private final BalanceMapper balanceMapper;
+  private final TurnoverMapper turnoverMapper;
+  private final ExcelUtils excelUtils;
   private Class bankClass = new Class();
   private Balance openBalance;
   private Balance closeBalance;
   private Turnover turnover;
-  LocalDate from;
-  LocalDate to;
-  private String fileName;
+  protected LocalDate from;
+  protected LocalDate to;
+  private File currentFile;
 
   @Autowired
-  public MainService(
+  public DataService(
       ClassRepository classRepository,
       BalanceRepository balanceRepository,
       TurnoverRepository turnoverRepository,
-      ExcelFileService excelFileService) {
+      FileRepository fileRepository,
+      BalanceMapper balanceMapper,
+      TurnoverMapper turnoverMapper,
+      ExcelUtils excelUtils) {
     this.classRepository = classRepository;
     this.balanceRepository = balanceRepository;
     this.turnoverRepository = turnoverRepository;
-    this.excelFileService = excelFileService;
+    this.fileRepository = fileRepository;
+    this.balanceMapper = balanceMapper;
+    this.turnoverMapper = turnoverMapper;
+    this.excelUtils = excelUtils;
+  }
+
+  /**
+   * gets balances by file name
+   * @param name name of the file to find balances by
+   * @return list containing all balances
+   */
+  public List<BalanceDto> getBalances(String name) {
+    File file = fileRepository.findByName(name);
+    List<Balance> balances = balanceRepository.findByFileId(file);
+    return balanceMapper.convertToDto(balances);
+  }
+
+  /**
+   * gets turnovers by file name
+   * @param name name of the file to find turnovers by
+   * @return list containing all turnovers
+   */
+  public List<TurnoverDto> getTurnovers(String name) {
+    File file = fileRepository.findByName(name);
+    List<Turnover> turnovers = turnoverRepository.findByFileId(file);
+    return turnoverMapper.convertToDto(turnovers);
   }
 
   /**
@@ -66,18 +106,23 @@ public class MainService {
       POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(filePath.toString()));
       HSSFWorkbook wb = new HSSFWorkbook(fs);
       HSSFSheet sheet = wb.getSheetAt(0);
-      excelFileService.initHeaders(sheet);
-      LocalDate[] dates = excelFileService.getTimeRange(sheet);
+      excelUtils.initHeaders(sheet);
+
+      currentFile = new File(filePath.getFileName().toString());
+      fileRepository.create(currentFile);
+
+      LocalDate[] dates = excelUtils.getTimeRange(sheet);
       from = dates[0];
       to = dates[1];
-      for (int rowNum = excelFileService.getDataStartRow(sheet);
+
+      for (int rowNum = excelUtils.getDataStartRow(sheet);
           rowNum < sheet.getLastRowNum();
           rowNum++) {
         Row row = sheet.getRow(rowNum);
         if (Objects.nonNull(row)) {
           Cell firstCell = row.getCell(0);
-          if (excelFileService.isSumRow(firstCell)) continue;
-          if (excelFileService.isClassRow(firstCell)) {
+          if (excelUtils.isSumRow(firstCell)) continue;
+          if (excelUtils.isClassRow(firstCell)) {
             bankClass = Converter.stringToClassObject(firstCell.getStringCellValue());
             classRepository.create(bankClass);
             continue;
@@ -109,12 +154,13 @@ public class MainService {
     openBalance =
         new Balance(
             bankClass,
-            "OPENING",
+            BalanceType.OPENING,
             Integer.parseInt(billCell.getStringCellValue()),
             BigDecimal.valueOf(openBalanceAssetCell.getNumericCellValue()),
             BigDecimal.valueOf(openBalanceLiabilityCell.getNumericCellValue()),
             from,
-            to);
+            to,
+            currentFile);
     turnover =
         new Turnover(
             bankClass,
@@ -122,16 +168,18 @@ public class MainService {
             BigDecimal.valueOf(turnOverDebitCell.getNumericCellValue()),
             BigDecimal.valueOf(turnOverCreditCell.getNumericCellValue()),
             from,
-            to);
+            to,
+            currentFile);
     closeBalance =
         new Balance(
             bankClass,
-            "CLOSING",
+            BalanceType.CLOSING,
             Integer.parseInt(billCell.getStringCellValue()),
             BigDecimal.valueOf(closeBalanceAssetCell.getNumericCellValue()),
             BigDecimal.valueOf(closeBalanceLiabilityCell.getNumericCellValue()),
             from,
-            to);
+            to,
+            currentFile);
   }
 
   /**

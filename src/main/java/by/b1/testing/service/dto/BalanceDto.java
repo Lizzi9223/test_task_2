@@ -1,57 +1,34 @@
-package by.b1.testing.repository.entity;
+package by.b1.testing.service.dto;
 
-import by.b1.testing.repository.consts.NamedQueriesKeys;
+import by.b1.testing.repository.entity.Class;
+import by.b1.testing.repository.entity.File;
 import by.b1.testing.repository.enums.BalanceType;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 
-/** Entity that represents table 'balance' */
-@Entity(name = "balance")
-@NamedQueries({
-  @NamedQuery(
-      name = NamedQueriesKeys.BALANCE_FIND_ALL,
-      query = "SELECT b FROM balance b WHERE b.file_id = :file ORDER BY b.bank, b.file_id, b.bankClass")
-})
-public class Balance {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+/**
+ * Data transfer object for file entity
+ *
+ * @author Lizaveta Yakauleva
+ * @version 1.0
+ */
+public class BalanceDto {
   private Long id;
-
-  @ManyToOne
-  @JoinColumn(name = "class_number")
   private Class bankClass;
-
-  @Enumerated(EnumType.STRING)
   private BalanceType type;
   private int bank;
   private BigDecimal asset;
   private BigDecimal liability;
-
-  @Column(name = "from_date")
   private LocalDate from;
-
-  @Column(name = "to_date")
   private LocalDate to;
-
-  @ManyToOne
-  @JoinColumn(name = "files_id")
   private File file_id;
 
-  public Balance() {}
+  public BalanceDto() {}
 
-  public Balance(
+  public BalanceDto(
+      Long id,
       Class bankClass,
       BalanceType type,
       int bank,
@@ -60,6 +37,7 @@ public class Balance {
       LocalDate from,
       LocalDate to,
       File file_id) {
+    this.id = id;
     this.bankClass = bankClass;
     this.type = type;
     this.bank = bank;
@@ -103,7 +81,7 @@ public class Balance {
   }
 
   public BigDecimal getAsset() {
-    return asset;
+    return asset.setScale(2, RoundingMode.HALF_UP);
   }
 
   public void setAsset(BigDecimal asset) {
@@ -111,7 +89,7 @@ public class Balance {
   }
 
   public BigDecimal getLiability() {
-    return liability;
+    return liability.setScale(2, RoundingMode.HALF_UP);
   }
 
   public void setLiability(BigDecimal liability) {
@@ -150,27 +128,44 @@ public class Balance {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Balance balance = (Balance) o;
-    return Objects.equals(id, balance.id);
+    BalanceDto that = (BalanceDto) o;
+    return bank == that.bank
+        && Objects.equals(id, that.id)
+        && Objects.equals(bankClass, that.bankClass)
+        && type == that.type
+        && Objects.equals(asset, that.asset)
+        && Objects.equals(liability, that.liability)
+        && Objects.equals(from, that.from)
+        && Objects.equals(to, that.to)
+        && Objects.equals(file_id, that.file_id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(id, bankClass, type, bank, asset, liability, from, to, file_id);
   }
 
   @Override
   public String toString() {
-    return "Balance{" +
-        "id=" + id +
-        ", bankClass=" + bankClass +
-        ", type=" + type +
-        ", bank=" + bank +
-        ", asset=" + asset +
-        ", liability=" + liability +
-        ", from=" + from +
-        ", to=" + to +
-        ", file_id=" + file_id +
-        '}';
+    return "BalanceDto{"
+        + "id="
+        + id
+        + ", bankClass="
+        + bankClass
+        + ", type="
+        + type
+        + ", bank="
+        + bank
+        + ", asset="
+        + asset
+        + ", liability="
+        + liability
+        + ", from="
+        + from
+        + ", to="
+        + to
+        + ", file_id="
+        + file_id
+        + '}';
   }
 }

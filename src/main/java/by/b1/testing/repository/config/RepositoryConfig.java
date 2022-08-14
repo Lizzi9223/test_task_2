@@ -4,12 +4,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration class for repository layer
  */
-@Component
+@Configuration
 @ComponentScan("by.b1.testing")
 public class RepositoryConfig{
 

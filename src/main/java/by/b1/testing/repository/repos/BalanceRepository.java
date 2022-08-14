@@ -1,7 +1,9 @@
 package by.b1.testing.repository.repos;
 
 import by.b1.testing.repository.consts.NamedQueriesKeys;
+import by.b1.testing.repository.consts.Parameters;
 import by.b1.testing.repository.entity.Balance;
+import by.b1.testing.repository.entity.File;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -37,12 +39,13 @@ public class BalanceRepository {
   }
 
   /**
-   * searches for all records in balance table
+   * searches for all records in balance table by file id
    * @return list with all found records
    */
-  public List<Balance> findAll() {
+  public List<Balance> findByFileId(File file) {
     return entityManager
         .createNamedQuery(NamedQueriesKeys.BALANCE_FIND_ALL, Balance.class)
+        .setParameter(Parameters.FILE, file)
         .getResultList();
   }
 }

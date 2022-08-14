@@ -20,6 +20,9 @@ public class Class {
   @OneToMany(mappedBy = "bankClass", cascade = CascadeType.ALL)
   private Set<Balance> balances = new HashSet<>();
 
+  @OneToMany(mappedBy = "bankClass", cascade = CascadeType.ALL)
+  private Set<Turnover> turnovers = new HashSet<>();
+
   public Class() {}
 
   public Class(Long number, String description) {
@@ -41,6 +44,22 @@ public class Class {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public Set<Balance> getBalances() {
+    return balances;
+  }
+
+  public void setBalances(Set<Balance> balances) {
+    this.balances = balances;
+  }
+
+  public Set<Turnover> getTurnovers() {
+    return turnovers;
+  }
+
+  public void setTurnovers(Set<Turnover> turnovers) {
+    this.turnovers = turnovers;
   }
 
   @Override

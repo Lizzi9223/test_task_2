@@ -1,52 +1,32 @@
-package by.b1.testing.repository.entity;
+package by.b1.testing.service.dto;
 
-import by.b1.testing.repository.consts.NamedQueriesKeys;
+import by.b1.testing.repository.entity.Class;
+import by.b1.testing.repository.entity.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 
-/** Entity that represents table 'turnover' */
-@Entity(name = "turnover")
-@NamedQueries({
-  @NamedQuery(
-      name = NamedQueriesKeys.TURNOVER_FIND_ALL,
-      query = "SELECT t FROM turnover t WHERE t.file_id = :file ORDER BY t.bank, t.bankClass")
-})
-public class Turnover {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+/**
+ * Data transfer object for turnover entity
+ *
+ * @author Lizaveta Yakauleva
+ * @version 1.0
+ */
+public class TurnoverDto {
   private Long id;
-
-  @ManyToOne
-  @JoinColumn(name = "class_number")
   private Class bankClass;
-
   private int bank;
   private BigDecimal debit;
   private BigDecimal credit;
-
-  @Column(name = "from_date")
   private LocalDate from;
-
-  @Column(name = "to_date")
   private LocalDate to;
-
-  @ManyToOne
-  @JoinColumn(name = "files_id")
   private File file_id;
 
-  public Turnover() {}
+  public TurnoverDto() {}
 
-  public Turnover(
+  public TurnoverDto(
+      Long id,
       Class bankClass,
       int bank,
       BigDecimal debit,
@@ -54,6 +34,7 @@ public class Turnover {
       LocalDate from,
       LocalDate to,
       File file_id) {
+    this.id = id;
     this.bankClass = bankClass;
     this.bank = bank;
     this.debit = debit;
@@ -88,7 +69,7 @@ public class Turnover {
   }
 
   public BigDecimal getDebit() {
-    return debit;
+    return debit.setScale(2, RoundingMode.HALF_UP);
   }
 
   public void setDebit(BigDecimal debit) {
@@ -96,7 +77,7 @@ public class Turnover {
   }
 
   public BigDecimal getCredit() {
-    return credit;
+    return credit.setScale(2, RoundingMode.HALF_UP);
   }
 
   public void setCredit(BigDecimal credit) {
@@ -135,18 +116,25 @@ public class Turnover {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Turnover turnover = (Turnover) o;
-    return Objects.equals(id, turnover.id);
+    TurnoverDto that = (TurnoverDto) o;
+    return bank == that.bank
+        && Objects.equals(id, that.id)
+        && Objects.equals(bankClass, that.bankClass)
+        && Objects.equals(debit, that.debit)
+        && Objects.equals(credit, that.credit)
+        && Objects.equals(from, that.from)
+        && Objects.equals(to, that.to)
+        && Objects.equals(file_id, that.file_id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(id, bankClass, bank, debit, credit, from, to, file_id);
   }
 
   @Override
   public String toString() {
-    return "Turnover{"
+    return "TurnoverDto{"
         + "id="
         + id
         + ", bankClass="
