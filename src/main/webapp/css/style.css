@@ -1,0 +1,30 @@
+            .btn{
+              background-color: #04AA6D;
+              border: 1px solid green;
+              color: white;
+              padding: 10px 24px;
+              cursor: pointer;
+              display: block;
+            }
+
+            .btn:hover {
+              background-color: #3e8e41;
+            } 
+
+            .button{
+                padding: 14px 28px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 14px;
+                margin: 4px 2px;
+                transition-duration: 0.4s;
+                cursor: pointer;
+                background-color: #4CAF50; 
+                color: white; 
+                border: 2px solid #4CAF50;
+            }            
+            .button:hover {
+                background-color: white;
+                color: black;
+            }

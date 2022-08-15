@@ -27,6 +27,7 @@ public class ClassRepository {
   public void create(Class bankClass) {
     try {
       entityManager.getTransaction().begin();
+      entityManager.clear();
       entityManager.persist(bankClass);
       entityManager.getTransaction().commit();
     } catch (PersistenceException e) {

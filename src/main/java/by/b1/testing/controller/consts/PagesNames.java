@@ -10,4 +10,5 @@ public class PagesNames {
   public static final String HOME = "home";
   public static final String DATA = "data";
   public static final String FILES = "files";
+  public static final String ERROR = "error";
 }

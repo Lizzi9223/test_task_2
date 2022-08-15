@@ -8,6 +8,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Converts Balance entity to Balance DTO
+ *
+ * @author Lizaveta Yakauleva
+ * @version 1.0
+ */
 @Component
 public class BalanceMapper {
   private final ModelMapper modelMapper;

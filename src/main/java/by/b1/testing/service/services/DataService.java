@@ -33,7 +33,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 /**
- * Contains methods to work with repositories
+ * Contains methods to work with file data
  *
  * @author Lizaveta Yakauleva
  * @version 1.0
@@ -129,6 +129,8 @@ public class DataService {
           }
           parseExcelToObjects(row);
           saveToDatabase(openBalance, closeBalance, turnover);
+          wb.close();
+          fs.close();
         }
       }
 

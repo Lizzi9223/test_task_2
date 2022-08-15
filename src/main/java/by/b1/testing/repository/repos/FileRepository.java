@@ -33,7 +33,7 @@ public class FileRepository {
       entityManager.getTransaction().commit();
     } catch (PersistenceException e) {
       entityManager.getTransaction().rollback();
-      throw new RuntimeException();
+      throw e;
     }
   }
 

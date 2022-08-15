@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 public class RepositoryConfig{
 
   /**
-   * creates entity manager factory and it's entity manager
+   * creates EntityManager bean
    * @return entity manager
    */
   @Bean
